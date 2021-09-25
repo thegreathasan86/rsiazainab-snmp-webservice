@@ -1,0 +1,189 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.css" type="text/css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Dashboard SISMO-Z</h2>
+
+        <div class="row">
+            <div class="col-lg-12">
+
+                <button class="btn btn-success float-right" data-toggle="modal"
+                    data-target="#addDataPerangkat">Tambah</button>
+
+                <!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Launch demo modal</button>
+                    -->
+            </div>
+        </div>
+
+        <table class="table table-striped" id="mytable">
+            <thead>
+                <tr>
+                    <th> No. </th>
+                    <th> Nama Perangkat </th>
+                    <th> IP Perangkat </th>
+                    <th> Lokasi Perangkat </th>
+                    <th> Status Perangkat </th>
+                    <th> Action </th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each results}}
+                <tr>
+                    <td> {{ idperangkat }} </td>
+                    <td> {{ nama_perangkat }} </td>
+                    <td> {{ ip_perangkat }} </td>
+                    <td> {{ lantai }} </td>
+                    <td> UP or Down </td>
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-sm btn-info edit" data-id="{{ idperangkat }}" data-nama_perangkat="{{ nama_perangkat }}" data-ip_perangkat="{{ ip_perangkat }}" data-lantai="{{ lantai }}"> EDIT </a>
+                        <a href="javascript:void(0);" class="btn btn-sm btn-danger delete" data-id="{{ idperangkat }}">
+                            DELETE </a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- Modal Add Perangkat -->
+    <form action="/save_perangkat" method="post">
+        <!-- Modal -->
+        <div class="modal fade" id="addDataPerangkat" tabindex="-1" role="dialog"
+            aria-labelledby="addDataPerangkatTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Tambah Data Perangkat</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="text" name="nama_perangkat" class="form-control" placeholder="Nama Perangkat"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="ip_perangkat" class="form-control" placeholder="IP Perangkat"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="lantai" class="form-control" placeholder="Lantai Berapa" required>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+       <!-- Modal Update Perangkat -->
+    <form action="/update_perangkat" method="post">
+        <!-- Modal -->
+        <div class="modal fade" id="EditModal" tabindex="-1" role="dialog"
+            aria-labelledby="addDataPerangkatTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Tambah Data Perangkat</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="text" name="nama_perangkat" class="form-control nama_perangkat" placeholder="Nama Perangkat"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" name="ip_perangkat" class="form-control ip_perangkat" placeholder="IP Perangkat"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" name="lantai" class="form-control lantai" placeholder="Lantai Berapa" required>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" name="id" class="idperangkat">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Modal Delete Perangkat -->
+    <form action="/delete_perangkat" method="post">
+        <!-- Modal -->
+        <div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog"
+            aria-labelledby="addDataPerangkatTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Hapus Data Perangkat</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                        <h1>Anda Yakin Hapus Data ?</h1>
+                    <div class="modal-footer">
+                        <input type="hidden" name="id" class="idperangkat">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/bootstrap.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            //show modal untuk edit
+            $('#mytable').on('click','.edit', function(){
+                var idperangkat = $(this).data('id');
+                var nama_perangkat = $(this).data('nama_perangkat');
+                var ip_perangkat = $(this).data('ip_perangkat');
+                var lantai = $(this).data('lantai');
+
+                $('#EditModal').modal('show');
+                $('.nama_perangkat').val(nama_perangkat);
+                $('.ip_perangkat').val(ip_perangkat);
+                $('.idperangkat').val(idperangkat);   
+                $('.lantai').val(lantai);   
+            });
+
+            //modal untuk delete data
+            $('#mytable').on('click','.delete', function(){
+                var idperangkat = $(this).data('id');
+                $('#DeleteModal').modal('show');
+                $('.idperangkat').val(idperangkat);
+                
+                
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

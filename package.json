@@ -1,0 +1,46 @@
+{
+  "name": "sismo_z_web",
+  "version": "1.0.0",
+  "description": "sismo z web",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "keywords": [
+    "express",
+    "firebase",
+    "mysql",
+    "rsia",
+    "zainab"
+  ],
+  "author": "thegreathasan@2021",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.2.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "debug": "^4.3.2",
+    "errorhandler": "^1.5.1",
+    "express": "^4.17.1",
+    "express-mysql-session": "^2.1.7",
+    "express-session": "^1.17.2",
+    "fcm-node": "^1.6.1",
+    "hbs": "^4.1.2",
+    "helmet": "^4.6.0",
+    "modbus-serial": "^8.0.3",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.0",
+    "net-snmp": "^3.5.4",
+    "node-cron": "^3.0.0",
+    "node-pre-gyp": "^0.17.0",
+    "ping-monitor": "^0.6.1",
+    "random": "^3.0.6",
+    "sequelize": "^6.6.5",
+    "sequelize-cli": "^6.2.0"
+  },
+  "devDependencies": {
+    "@babel/helper-compilation-targets": "^7.15.0"
+  }
+}
