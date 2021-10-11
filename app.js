@@ -81,82 +81,200 @@ var task = cron.schedule('*/20 * * * * *', () => {
         // console.log(myObject);
         var myArray = myObject;
 
-        myArray.forEach(function(ipdevice){
-            console.log('ip dari database:'+ ipdevice);
+        myArray.forEach(function (ipdevice) {
+            // console.log('ip dari database:' + ipdevice);
 
             var session = snmp.createSession(ipdevice, "public");
 
+            var oids = ["1.3.6.1.2.1.2.2.1.8.3", "1.3.6.1.2.1.2.2.1.16.3", "1.3.6.1.2.1.2.2.1.16.8", "1.3.6.1.2.1.2.2.1.16.18", "1.3.6.1.2.1.2.2.1.10.3", "1.3.6.1.2.1.2.2.1.10.8", "1.3.6.1.2.1.2.2.1.10.18"];
 
-            var oids = ["1.3.6.1.2.1.2.2.1.8.3", "1.3.6.1.2.1.2.2.1.16.3", "1.3.6.1.2.1.2.2.1.10.3"];
 
+            // var oidss = ["1.3.6.1.2.1.2.2.1.8.3"];
+            session.get(oids, function (error, varbinds) {
+                // console.log('list: '+oids);
 
-        session.get(oids, function (error, varbinds) {
-            if (error) {
-                console.error('dari sini: '+ error);
+                if (error) {
+                    console.error('======================');
+                    console.error('ipdevice :' + ipdevice + ' ' + error);
 
-                //INSERT KE DB  
-                let dataoid2 = {
-                    idperangkat: ipdevice,
-                    status: 'Down',
-                    transmitte_upload: 0,
-                    receive_download: 0,
-                    timestamp: dformat,
-                };
-
-                let sql = "INSERT INTO traffic SET ?";
-                let query = conn.query(sql, dataoid2, (err, results) => {
-                    if (err) throw err
-                    // console.log("from_savedataoid2 " + results);
-                });
-
-            } else {
-                if (snmp.isVarbindError(varbinds)) {
-                    console.error(snmp.varbindError(varbinds));
-                } else {
-                    let statusOID = varbinds[0].value;
-                    switch (statusOID) {
-                        case 0:
-                            statusDevice = "Down";
-                            break;
-                        case 1:
-                            statusDevice = "Up";
-                            break;
-                        default:
-                            statusDevice = "Unknown";
-                    }
-                    let upload = varbinds[1].value / 1024 / 1024; //convert bytes to megabytes
-                    let download = varbinds[2].value / 1024 / 1024; //convert bytes to megabytes
-                    console.log(statusOID, upload, download, statusDevice);
-    
                     //INSERT KE DB  
-                    let dataoid = {
+                    let dataoid2 = {
                         idperangkat: ipdevice,
-                        status: statusDevice,
-                        transmitte_upload: upload,
-                        receive_download: download,
+                        status: 'Down',
+                        transmitte_upload: 0,
+                        receive_download: 0,
                         timestamp: dformat,
                     };
-    
+
                     let sql = "INSERT INTO traffic SET ?";
-                    let query = conn.query(sql, dataoid, (err, results) => {
+                    let query = conn.query(sql, dataoid2, (err, results) => {
                         if (err) throw err
-                        // console.log("from_savedataoid " + results);
+                        // console.log("from_savedataoid2 " + results);
                     });
+
+                } else {
+                    if (snmp.isVarbindError(varbinds)) {
+                        console.error('varbindError :' + snmp.varbindError(varbinds));
+                    } else {
+                        // console.log('varbind adalah '+ varbinds);
+
+                        let statusOID = varbinds[0].value;
+                        switch (statusOID) {
+                            case 0:
+                                statusDevice = "Down";
+                                break;
+                            case 1:
+                                statusDevice = "Up";
+                                break;
+                            case 2:
+                                statusDevice = "Up";
+                                break;
+                            case 3:
+                                statusDevice = "Up";
+                                break;
+                            case 4:
+                                statusDevice = "Up";
+                                break;
+                            case 5:
+                                statusDevice = "Up";
+                                break;
+                            case 6:
+                                statusDevice = "Up";
+                                break;
+                            case 7:
+                                statusDevice = "Up";
+                                break;
+                            case 8:
+                                statusDevice = "Up";
+                                break;
+                            case 9:
+                                statusDevice = "Up";
+                                break;
+                            default:
+                                statusDevice = "Unknown";
+                        }
+                        // let upload = varbinds[1].value / 1024 / 1024; //convert bytes to megabytes
+                        let upload = varbinds[1].value / 1024 / 1024 + varbinds[2].value / 1024 / 1024 + varbinds[3].value / 1024 / 1024; //convert bytes to megabytes
+
+                        // let download = varbinds[3].value / 1024 / 1024; //convert bytes to megabytes
+                        let download = varbinds[4].value / 1024 / 1024 + varbinds[5].value / 1024 / 1024 + varbinds[6].value / 1024 / 1024; //convert bytes to megabytes
+
+                        console.log(ipdevice, ':', statusOID, upload, download, statusDevice);
+
+                        //INSERT KE DB  
+                        let dataoid = {
+                            idperangkat: ipdevice,
+                            status: statusDevice,
+                            transmitte_upload: upload,
+                            receive_download: download,
+                            timestamp: dformat,
+                        };
+
+                        let sql = "INSERT INTO traffic SET ?";
+                        let query = conn.query(sql, dataoid, (err, results) => {
+                            if (err) throw err
+                            // console.log("from_savedataoid " + results);
+                        });
+                    }
+
+
                 }
-    
-    
-            }
-            session.close();
+                session.close();
             });
 
         });
 
-        
-
-        
-
     });
 
+
+    var session = snmp.createSession("127.0.0.1", "public");
+
+    var oids = ["1.3.6.1.2.1.2.2.1.8.3", "1.3.6.1.2.1.2.2.1.16.3", "1.3.6.1.2.1.2.2.1.10.3"];
+
+    session.get(oids, function (error, varbinds) {
+
+        if (error) {
+            console.error('======================');
+            console.error('ipdevice :' + ipdevice + ' ' + error);
+
+            //INSERT KE DB  
+            let dataoid2 = {
+                idperangkat: '127.0.0.1',
+                status: 'Down',
+                transmitte_upload: 0,
+                receive_download: 0,
+                timestamp: dformat,
+            };
+
+            let sql = "INSERT INTO traffic SET ?";
+            let query = conn.query(sql, dataoid2, (err, results) => {
+                if (err) throw err
+                // console.log("from_savedataoid2 " + results);
+            });
+
+        } else {
+            if (snmp.isVarbindError(varbinds)) {
+                console.error('varbindError :' + snmp.varbindError(varbinds));
+            } else {
+                let statusOID = varbinds[0].value;
+                switch (statusOID) {
+                    case 0:
+                        statusDevice = "Down";
+                        break;
+                    case 1:
+                        statusDevice = "Up";
+                        break;
+                    case 2:
+                        statusDevice = "Up";
+                        break;
+                    case 3:
+                        statusDevice = "Up";
+                        break;
+                    case 4:
+                        statusDevice = "Up";
+                        break;
+                    case 5:
+                        statusDevice = "Up";
+                        break;
+                    case 6:
+                        statusDevice = "Up";
+                        break;
+                    case 7:
+                        statusDevice = "Up";
+                        break;
+                    case 8:
+                        statusDevice = "Up";
+                        break;
+                    case 9:
+                        statusDevice = "Up";
+                        break;
+                    default:
+                        statusDevice = "Unknown";
+                }
+                // let upload = varbinds[1].value / 1024 / 1024; //convert bytes to megabytes
+                let upload = varbinds[1].value / 1024 / 1024;//convert bytes to megabytes
+
+                // let download = varbinds[3].value / 1024 / 1024; //convert bytes to megabytes
+                let download = varbinds[2].value / 1024 / 1024; //convert bytes to megabytes
+
+                //INSERT KE DB  
+                let dataoid = {
+                    idperangkat: '127.0.0.1',
+                    status: statusDevice,
+                    transmitte_upload: upload,
+                    receive_download: download,
+                    timestamp: dformat,
+                };
+
+                let sql = "INSERT INTO traffic SET ?";
+                let query = conn.query(sql, dataoid, (err, results) => {
+                    if (err) throw err
+                    // console.log("from_savedataoid " + results);
+                });
+            }
+        }
+        session.close();
+    });
 
 
     //// end function snmp
@@ -165,7 +283,7 @@ var task = cron.schedule('*/20 * * * * *', () => {
     // nilai Int undefined In, bytes 1.3.6.1.2.1.2.2.1.16.3
     // nilai Int undefined Out, bytes1.3.6.1.2.1.2.2.1.10.3
 
-   
+
 
     session.trap(snmp.TrapType.LinkDown, function (error) {
         if (error) {
@@ -179,6 +297,9 @@ var task = cron.schedule('*/20 * * * * *', () => {
 
 
     /// end 
+
+
+
 
 }, {
     scheduled: true,
@@ -306,7 +427,7 @@ app.get('/ip_perangkat', (req, res) => {
         if (err) throw err;
 
         const myObject = results.map(item => item.ip_perangkat)
-        res.json(myObject);
+        res.json(results);
 
     });
 
