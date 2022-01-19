@@ -6,6 +6,47 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const cron = require('node-cron');
 const snmp = require('net-snmp');
+
+
+// const { Client } = require('ssh2');
+// const sshClient = new Client();
+
+
+var mysql2 = require('mysql2');
+var SSH2Client = require('ssh2').Client;
+
+//new
+const http = require('http');
+
+const {
+    Client,
+    HTTPAgent,
+    HTTPSAgent
+} = require('ssh2');
+//new
+
+const sshConfig = {
+    host: '103.172.205.157',
+    port: 22,
+    username: 'sismo_setiawan',
+    password: 'Ahayyy123#'
+};
+
+// Use `HTTPSAgent` instead for an HTTPS request
+const agent = new HTTPAgent(sshConfig);
+http.get({
+    host: '103.172.205.157',
+    agent,
+    headers: {
+        Connection: 'close'
+    }
+}, (res) => {
+    console.log(res.statusCode);
+    console.dir(res.headers);
+    res.resume();
+});
+
+
 // const monitor = require('ping-monitor');
 
 const session = require('express-session');
@@ -15,6 +56,9 @@ const MySQLStore = require('express-mysql-session')(session);
 const {
     forEach
 } = require("async");
+const {
+    connect
+} = require("http2");
 
 // const agentsnmp = require('./snmp_agent');
 
@@ -23,7 +67,7 @@ const SERVER_KEY = 'AAAAW5akEUo:APA91bEk_No2FZuUcgv_E5DMeGPwb_qYVtbi9C96yzOqyWbv
 
 var app = express();
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 5000;
 
 app.listen(port, () => {
     console.log('listening on port ', port);
@@ -109,7 +153,7 @@ var task = cron.schedule('*/20 * * * * *', () => {
                     let sql = "INSERT INTO traffic SET ?";
                     let query = conn.query(sql, dataoid2, (err, results) => {
                         if (err) throw err
-                        // console.log("from_savedataoid2 " + results);
+                        console.log("from_savedataoid2 " + results);
                     });
 
                 } else {
@@ -173,7 +217,7 @@ var task = cron.schedule('*/20 * * * * *', () => {
                         let sql = "INSERT INTO traffic SET ?";
                         let query = conn.query(sql, dataoid, (err, results) => {
                             if (err) throw err
-                            // console.log("from_savedataoid " + results);
+                            console.log("from_savedataoid " + results);
                         });
                     }
 
@@ -252,7 +296,7 @@ var task = cron.schedule('*/20 * * * * *', () => {
                         statusDevice = "Unknown";
                 }
                 // let upload = varbinds[1].value / 1024 / 1024; //convert bytes to megabytes
-                let upload = varbinds[1].value / 1024 / 1024;//convert bytes to megabytes
+                let upload = varbinds[1].value / 1024 / 1024; //convert bytes to megabytes
 
                 // let download = varbinds[3].value / 1024 / 1024; //convert bytes to megabytes
                 let download = varbinds[2].value / 1024 / 1024; //convert bytes to megabytes
@@ -269,7 +313,7 @@ var task = cron.schedule('*/20 * * * * *', () => {
                 let sql = "INSERT INTO traffic SET ?";
                 let query = conn.query(sql, dataoid, (err, results) => {
                     if (err) throw err
-                    // console.log("from_savedataoid " + results);
+                    console.log("from_savedataoid " + results);
                 });
             }
         }
@@ -311,19 +355,197 @@ task.start();
 
 
 
+
+// var sshConf = {
+//     host: '103.172.205.157',
+//     port: 22,
+//     username: 'sismo_setiawan',
+//     password: 'Ahayyy123#'
+// };
+
+// var sqlConf = {
+//     user: 'sismo',
+//     database: 'sismo',
+//     password: 'Ahayyy123#',
+//     port: '3306',
+//     timeout: 500000
+// };
+
+// var ssh = new SSH2Client();
+// ssh.on('ready', function () {
+//     ssh.forwardIn(
+//         // source IP the connection would have came from. this can be anything since we
+//         // are connecting in-process
+//         //   '127.0.0.1',
+//         '103.172.205.157',
+//         // source port. again this can be randomized and technically should be unique
+//         //   24000,
+//         // 5000,
+//            22, 
+//         // 3306,
+//         // destination IP on the remote server
+//         // '127.0.0.1',
+//         '103.172.205.157',
+//         // destination port at the destination IP
+//         //   3306,
+//         80,
+//         function (err, stream) {
+//             // you will probably want to handle this better,
+//             // in case the tunnel couldn't be created due to server restrictions
+//             if (err) throw err;
+//             console.log('error here :');
+
+//             // if you use `sqlConf` elsewhere, be aware that the following will
+//             // mutate that object by adding the stream object for simplification purposes
+//             sqlConf.stream = stream;
+//             var db = mysql.createConnection(sqlConf);
+
+//             // now use `db` to make your queries
+
+//             //route untuk homepage
+//             app.get('/', (req, res) => {
+//                 let sql = "SELECT * FROM perangkat";
+//                 let query = db.query(sql, (err, results) => {
+//                     console.log(err);
+//                     res.render('home_view', {
+//                         results: results
+//                     });
+//                 });
+//             });
+
+
+//             //route untuk homepage
+//             app.get('/ip_perangkat', (req, res) => {
+//                 let sql = "SELECT * FROM perangkat";
+//                 let query = db.query(sql, (err, results) => {
+//                     if (err) throw err;
+
+//                     const myObject = results.map(item => item.ip_perangkat)
+//                     res.json(results);
+
+//                 });
+
+
+//             });
+
+
+//             //route input data
+//             app.post('/save_perangkat', (req, res) => {
+//                 let data = {
+//                     nama_perangkat: req.body.nama_perangkat,
+//                     ip_perangkat: req.body.ip_perangkat,
+//                     lantai: req.body.lantai
+//                 };
+
+//                 let sql = "INSERT INTO perangkat SET ?";
+//                 let query = db.query(sql, data, (err, results) => {
+//                     if (err) throw err;
+//                     res.redirect('/');
+//                 });
+//             });
+
+
+
+//             //route update data
+//             app.post('/update_perangkat', (req, res) => {
+//                 let sql = "UPDATE perangkat SET nama_perangkat='" + req.body.nama_perangkat + "', ip_perangkat='" + req.body.ip_perangkat + "', lantai='" + req.body.lantai + "' WHERE idperangkat=" + req.body.id;
+//                 let query = db.query(sql, (err, results) => {
+//                     if (err) throw err;
+//                     res.redirect('/');
+//                 });
+//             });
+
+//             //route delete data
+//             app.post('/delete_perangkat', (req, res) => {
+
+//                 let sql = "DELETE FROM sismo.perangkat WHERE idperangkat='" + req.body.id + "'";
+//                 let query = db.query(sql, (err, results) => {
+//                     if (err) throw err;
+//                     res.redirect('/');
+
+//                 });
+//             });
+
+
+
+//         }
+//     );
+// });
+// ssh.connect(sshConf);
+
+
+
+// connect ke db//
 const conn = mysql.createConnection({
     host: 'localhost',
     user: 'sismo',
-    password: 'ahay123',
+    password: 'Ahayyy123#',
     database: 'sismo',
     insecureAuth: true
 });
 
-//connect ke db
+
+
+// connect ke db//
 conn.connect((err) => {
     if (err) throw err;
     console.log('Connection to mysql success...');
 });
+
+
+
+// const dbServer = {
+//     host: 'localhost',
+//     port: 3306,
+//     user: 'sismo',
+//     password: 'Ahayyy123#',
+//     database: 'sismo'
+// }
+// const tunnelConfig = {
+//     host: '103.172.205.157',
+//     port: 22,
+//     username: 'sismo_setiawan',
+//     password: 'Ahayyy123#'
+// }
+// const forwardConfig = {
+//     srcHost: '103.172.205.157',
+//     srcPort: 22,
+//     dstHost: dbServer.host,
+//     dstPort: dbServer.port
+// };
+// const SSHConnection = new Promise((resolve, reject) => {
+//     sshClient.on('ready', () => {
+//         sshClient.forwardOut(
+//         forwardConfig.srcHost,
+//         forwardConfig.srcPort,
+//         forwardConfig.dstHost,
+//         forwardConfig.dstPort,
+//         (err, stream) => {
+//              if (err) reject(err);
+//              console.log('error ssh ' + err);
+//              const updatedDbServer = {
+//                  ...dbServer,
+//                  stream
+//             };
+
+//             const connection =  mysql.createConnection(updatedDbServer);
+//            connection.connect((error) => {
+//             if (error) {
+//                 reject(error);
+//                 console.log('Connection to mysql error...');
+//             }
+//             resolve(connection);
+//             });
+// });
+// }).connect(tunnelConfig);
+// });
+
+
+//connect ke db//
+// connection.connect((err) => {
+//     if (err) throw err;
+//     console.log('Connection to mysql success...');
+// });
 
 
 //session start
@@ -408,7 +630,7 @@ app.use(bodyParser.urlencoded({
 app.use('/assets', express.static(__dirname + '/public'));
 
 
-//route untuk homepage
+// //route untuk homepage
 app.get('/', (req, res) => {
     let sql = "SELECT * FROM perangkat";
     let query = conn.query(sql, (err, results) => {
@@ -420,7 +642,7 @@ app.get('/', (req, res) => {
 });
 
 
-//route untuk homepage
+// //route untuk homepage
 app.get('/ip_perangkat', (req, res) => {
     let sql = "SELECT * FROM perangkat";
     let query = conn.query(sql, (err, results) => {
@@ -435,7 +657,7 @@ app.get('/ip_perangkat', (req, res) => {
 });
 
 
-//route input data
+// //route input data
 app.post('/save_perangkat', (req, res) => {
     let data = {
         nama_perangkat: req.body.nama_perangkat,
@@ -452,7 +674,7 @@ app.post('/save_perangkat', (req, res) => {
 
 
 
-//route update data
+// //route update data
 app.post('/update_perangkat', (req, res) => {
     let sql = "UPDATE perangkat SET nama_perangkat='" + req.body.nama_perangkat + "', ip_perangkat='" + req.body.ip_perangkat + "', lantai='" + req.body.lantai + "' WHERE idperangkat=" + req.body.id;
     let query = conn.query(sql, (err, results) => {
@@ -461,7 +683,7 @@ app.post('/update_perangkat', (req, res) => {
     });
 });
 
-//route delete data
+// //route delete data
 app.post('/delete_perangkat', (req, res) => {
 
 
